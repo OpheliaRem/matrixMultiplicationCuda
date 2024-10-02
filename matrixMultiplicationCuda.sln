@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matrixMultiplicationCuda", "matrixMultiplicationCuda\matrixMultiplicationCuda.vcxproj", "{156D1A36-A00A-4C03-AE30-71761D27830E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{156D1A36-A00A-4C03-AE30-71761D27830E}.Debug|x64.ActiveCfg = Debug|x64
+		{156D1A36-A00A-4C03-AE30-71761D27830E}.Debug|x64.Build.0 = Debug|x64
+		{156D1A36-A00A-4C03-AE30-71761D27830E}.Release|x64.ActiveCfg = Release|x64
+		{156D1A36-A00A-4C03-AE30-71761D27830E}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2AE3745C-9990-4C91-9A86-1B6C8ED0A1B8}
+	EndGlobalSection
+EndGlobal
