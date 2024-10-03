@@ -21,7 +21,7 @@ __global__ void matrixMultiplicationKernel(const double* a, const double* b, dou
 
 int main()
 {
-    const size_t size = 10;
+    const size_t size = 1000;
 
 
     double* a = new double[size * size];
@@ -83,12 +83,13 @@ int main()
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
 
-    const int block_size = 512;
+    const int block_size = 32;
     dim3 dimBlock(block_size, block_size);
     dim3 dimGrid(size / block_size + 1, size / block_size + 1);
 
     cudaEventRecord(start);
     matrixMultiplicationKernel<<<dimGrid, dimBlock>>>(aDevice, bDevice, cDevice, size);
+    cudaEventRecord(stop);
     cudaStatus = cudaGetLastError();
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "addKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
@@ -111,20 +112,10 @@ int main()
     cudaFree(bDevice);
     cudaFree(cDevice);
 
-
-    for (int i = 0; i < size; ++i)
-    {
-        for (int j = 0; j < size; ++j)
-        {
-            printf("%.2lf\t", c[i * size + j]);
-        }
-        printf("\n");
-    }
-
     cudaEventSynchronize(stop);
     cudaDeviceSynchronize();
 
-    float milliseconds = 0;
+    float milliseconds;
     cudaEventElapsedTime(&milliseconds, start, stop);
     printf("CUDA time simple (ms): %f\n", milliseconds);
 
