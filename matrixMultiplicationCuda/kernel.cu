@@ -35,19 +35,49 @@ int main()
         c[i] = 0.0;
     }
 
+    cudaError_t cudaStatus = cudaSetDevice(0);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
+        return 1;
+    }
 
     const size_t sizeBytes = size * size * sizeof(double);
     double* aDevice;
     double* bDevice;
     double* cDevice;
 
-    cudaMalloc((void**)&aDevice, sizeBytes);
-    cudaMemcpy(aDevice, a, sizeBytes, cudaMemcpyHostToDevice);
+    cudaStatus = cudaMalloc((void**)&aDevice, sizeBytes);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMalloc failed!");
+        return 1;
+    }
 
-    cudaMalloc((void**)&bDevice, sizeBytes);
+   
+
+    cudaStatus = cudaMalloc((void**)&bDevice, sizeBytes);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMalloc failed!");
+        return 1;
+    }
+
+    cudaStatus = cudaMalloc((void**)&cDevice, sizeBytes);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMalloc failed!");
+        return 1;
+    }
+
+    cudaStatus = cudaMemcpy(aDevice, a, sizeBytes, cudaMemcpyHostToDevice);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMemcpy failed!");
+        return 1;
+    }
+
     cudaMemcpy(bDevice, b, sizeBytes, cudaMemcpyHostToDevice);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMemcpy failed!");
+        return 1;
+    }
 
-    cudaMalloc((void**)&cDevice, sizeBytes);
 
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
@@ -58,9 +88,24 @@ int main()
     dim3 dimGrid(size / block_size + 1, size / block_size + 1);
 
     cudaEventRecord(start);
-    matrixMultiplicationKernel << <dimGrid, dimBlock >> > (aDevice, bDevice, cDevice, size);
+    matrixMultiplicationKernel<<<dimGrid, dimBlock>>>(aDevice, bDevice, cDevice, size);
+    cudaStatus = cudaGetLastError();
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "addKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
+        return -1;
+    }
 
-    cudaMemcpy(c, cDevice, sizeBytes, cudaMemcpyDeviceToHost);
+    cudaStatus = cudaDeviceSynchronize();
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching addKernel!\n", cudaStatus);
+        return 1;
+    }
+
+    cudaStatus = cudaMemcpy(c, cDevice, sizeBytes, cudaMemcpyDeviceToHost);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMemcpy failed!");
+        return 1;
+    }
 
     cudaFree(aDevice);
     cudaFree(bDevice);
